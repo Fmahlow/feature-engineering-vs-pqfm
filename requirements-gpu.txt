@@ -1,0 +1,18 @@
+# Extras para rodar no servidor com GPU (ver README.md "Aceleracao por GPU"
+# e Secao 5/9.4 do plano). Instalar POR CIMA de requirements.txt:
+#
+#   pip install -r requirements.txt
+#   pip install -r requirements-gpu.txt
+#
+# 1) qiskit-aer com backend GPU (Nvidia/CUDA), para simulacao por vetor de
+#    estado dos PQFMs em bases de alta dimensao (I-SPY1, Molecular Toxicity,
+#    100+ qubits simulados -- Etapas 3 e 4 do plano). So compensa se optar
+#    por AerSimulator generico em vez da rota de simulacao por blocos/MPS
+#    ou da dequantizacao analitica (tecnica #0), que sao mais baratas.
+qiskit-aer-gpu
+
+# 2) torch com CUDA, para treinar mais rapido o autoencoder raso (tecnica
+#    #8), especialmente rodando as 50 dobras da CV aninhada em varias
+#    configuracoes/datasets. Escolher o indice de wheel compativel com a
+#    versao de CUDA do servidor, ex.:
+#    pip install torch --index-url https://download.pytorch.org/whl/cu121

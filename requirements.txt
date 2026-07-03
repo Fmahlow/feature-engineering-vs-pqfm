@@ -1,0 +1,24 @@
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+
+# geracao de features quanticas
+qiskit
+qiskit-aer
+git+https://github.com/rscarmo/pqfmlib.git
+
+# aquisicao de datasets
+ucimlrepo
+radMLBench
+
+# selecao de atributos hibrida (Breast Cancer Pathology)
+shap
+
+# checagem de robustez opcional (Secao 6.1 / 12 do plano)
+xgboost
+
+# tecnica classica #8 (autoencoder raso) -- ver requirements-gpu.txt para
+# a variante acelerada por GPU
+torch
