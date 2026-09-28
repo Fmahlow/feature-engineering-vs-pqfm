@@ -148,6 +148,26 @@ não é trivialmente "dequantizável" por blocos independentes.
 3. **A simulação quântica importa** — a dequantização analítica não captura o mesmo benefício,
    sugerindo que a geometria do espaço de Hilbert é relevante para o desempenho.
 
+
+---
+
+## 6. Teste de vazamento transdutivo (CD-Ising) — PENDENTE
+
+Compara o CD-Ising com J, padronização e imputação ajustados com todas as amostras
+(protocolo acima) contra o mesmo mapa ajustado **só no treino de cada dobra**, na mesma
+execução e com a mesma versão do `pqfmlib`. Script: `run_quantum_cv_perfold.py`;
+instruções: `INSTRUCOES_TESTE_VAZAMENTO.md`.
+
+| Dataset | Baseline | CD-Ising global (híb) | CD-Ising por dobra (híb) | Δ por dobra − global | Status por dobra vs baseline |
+|---|---|---|---|---|---|
+| Cardiac | a preencher | a preencher | a preencher | a preencher | a preencher |
+| I-SPY1 | a preencher | a preencher | a preencher | a preencher | a preencher |
+
+Execução parcial no container de nuvem (4 vCPUs): baseline do Cardiac recalculado =
+0.8883 (relatório: 0.8885); circuito CD-Ising de 13 qubits para as 303 amostras ≈ 25 s.
+Versão do `pqfmlib` nessa execução: 0.1.1 (a v0.1.1 corrigiu a ordem dos rótulos dos
+observáveis; o relatório acima usou a v0.1.0).
+
 ---
 
 *Figuras completas: `results/figures/etapa{1,2,3}_{dataset}_completo.png`*

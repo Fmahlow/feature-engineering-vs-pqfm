@@ -16,6 +16,9 @@ transdutivo não supervisionado.
 Uso (no ambiente com pqfmlib, Python >= 3.10):
   python run_quantum_cv_perfold.py --dataset cardiac
   python run_quantum_cv_perfold.py --dataset ispy1
+  python run_quantum_cv_perfold.py --dataset ispy1 --n_repeats 2   # checagem rápida (10 dobras)
+
+Instruções completas: INSTRUCOES_TESTE_VAZAMENTO.md
 
 Saída: results/vazamento_{dataset}_cdising_resultados.csv
        results/vazamento_{dataset}_cdising_estatistica_pareada.csv
@@ -40,6 +43,7 @@ ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 from src.datasets import load_breast_cancer_radiology, load_cardiac_disease
+import src.pipeline as _pipeline_mod
 from src.pipeline import run_nested_cv, run_nested_cv_precomputed
 from src.stats import paired_delta_summary
 
@@ -73,7 +77,10 @@ def cdising_transform(X_fit: np.ndarray, X_apply: np.ndarray, q_enc: int) -> np.
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", required=True, choices=list(LOADERS))
+    parser.add_argument("--n_repeats", type=int, default=10,
+                        help="repetições do 5-fold externo (10 = protocolo completo, 50 dobras)")
     args = parser.parse_args()
+    _pipeline_mod.N_REPEATS = args.n_repeats
     dname, q_enc = args.dataset, Q_ENC[args.dataset]
 
     X, y = LOADERS[dname]()
