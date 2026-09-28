@@ -1,5 +1,31 @@
 # Teste de vazamento transdutivo do CD-Ising: instruções para o servidor
 
+## Checklist para o agente (Claude Code) — seguir em ordem
+
+1. Confirme que está na branch `claude/stoic-hamilton-m085a3` e atualizada
+   (`git pull origin claude/stoic-hamilton-m085a3`).
+2. Localize o Python com `pqfmlib`: tente `.venv311/bin/python` primeiro e depois o
+   `python` ativo. Verifique com `python -c "import pqfmlib, qiskit_aer, radMLBench, ucimlrepo; print(pqfmlib.__version__)"`.
+   - Se faltar algo, instale no mesmo venv:
+     `pip install git+https://github.com/rscarmo/pqfmlib.git qiskit-aer ucimlrepo radMLBench`.
+   - Anote a versão do `pqfmlib`.
+3. Verifique os recursos (`nproc`, `free -g`, `nvidia-smi`) e informe ao usuário a
+   estimativa de tempo (ver "Execução" abaixo).
+4. Rode o **Cardiac** em background com `nohup` (comando abaixo) e acompanhe o log até o fim.
+5. Rode o **I-SPY1 rápido** (`--n_repeats 2`) em background e acompanhe até o fim.
+6. **Pergunte ao usuário** antes de rodar o I-SPY1 completo, porque pode levar muitas
+   horas. Mostre os resultados rápidos e o tempo medido por circuito.
+7. Com os CSVs gerados, preencha a **Seção 6** do `RELATORIO_FINAL.md`:
+   - uma linha por dataset, usando a linha `_hyb` de `results/vazamento_{ds}_cdising_estatistica_pareada.csv`;
+   - AUC média de cada label a partir de `results/vazamento_{ds}_cdising_resultados.csv`;
+   - a versão do `pqfmlib` e a máquina usadas;
+   - troque "PENDENTE" no título por "concluído" (ou "parcial", se o I-SPY1 completo não rodou).
+   - Se o status de alguma técnica mudar (ver "Como interpretar"), ajuste também as conclusões
+     das Etapas 1 e 3 e a Seção 5.
+8. Faça commit dos CSVs `results/vazamento_*` e do relatório, e dê push para a mesma branch.
+   Não faça commit dos logs nem de `results/quantum_precomputed/`.
+9. Resuma ao usuário, em poucas linhas, o que mudou na conclusão.
+
 ## Objetivo
 
 Verificar se o ganho do PQFM CD-Ising (Cardiac: +0.84 pp; I-SPY1: +4.97 pp) se mantém
