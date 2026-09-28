@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 .venv/
+.venv311/
 venv/
 *.egg-info/
 
@@ -15,4 +16,7 @@ data/processed/*
 # resultados pesados (deixar so tabelas de sintese pequenas versionadas,
 # se quiser versionar manualmente use `git add -f`)
 results/*.png
+results/**/*.png
 results/*.npz
+results/**/*.npz
+results/quantum_precomputed/
