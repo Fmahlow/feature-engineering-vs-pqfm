@@ -95,8 +95,15 @@ def main():
         records.append(df)
 
     # modo por dobra: feature_fn recebe X já imputado/padronizado com fit no treino
+    # cache por dobra: os modos iso e híb reutilizam o mesmo circuito
+    cache: dict[bytes, np.ndarray] = {}
+
     def feature_fn(X_tr_sc, X_te_sc):
-        Xq = cdising_transform(X_tr_sc, np.vstack([X_tr_sc, X_te_sc]), q_enc)
+        X_apply = np.vstack([X_tr_sc, X_te_sc])
+        key = X_apply.tobytes()
+        if key not in cache:
+            cache[key] = cdising_transform(X_tr_sc, X_apply, q_enc)
+        Xq = cache[key]
         return Xq[: len(X_tr_sc)], Xq[len(X_tr_sc):]
 
     for mode, suffix in [("isolated", "iso"), ("hybrid", "hyb")]:

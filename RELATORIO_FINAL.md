@@ -24,8 +24,12 @@ na dissertação de Carmo (2026), com o mesmo pipeline GBC e protocolo de CV ani
 | q_enc | 13 qubits (Cardiac), 20 qubits (WDBC, I-SPY1) |
 
 **Nota sobre os PQFMs**: features quânticas pré-computadas uma vez por dataset (abordagem
-transductiva), consistente com a dissertação. A seleção de qubits via informação mútua usa
-todas as amostras (vazamento leve no critério de seleção, não no treinamento por fold).
+transdutiva), consistente com a dissertação. Antes da CV, a imputação, a padronização e a
+matriz J de informação mútua **entre atributos** são ajustadas com todas as amostras
+(`run_quantum_cv.py`). O rótulo *y* não é usado pelo `pqfmlib` em nenhuma etapa (a MI é
+atributo×atributo; *y* só é gravado junto às features de saída), portanto **não há
+vazamento de rótulo** — apenas vazamento transdutivo não supervisionado (a distribuição de
+*X* do teste influencia J e a escala). O efeito desse vazamento é medido na Seção 6.
 
 ## 3. Resultados por dataset
 
@@ -87,8 +91,11 @@ overfitting severo sobre os 569 samples.
 | PQFM | Heisenberg (iso) | 0.5192 | −0.0056 | 0.581 | Sem ganho |
 | PQFM | XYZ (iso) | 0.4758 | −0.0490 | 0.991 | Sem ganho |
 
-**Conclusão:** O CD-Ising (20 qubits, selecionados por MI de 370 features) atua como
-**redução de dimensionalidade quântica eficaz**: +4.97 pp vs baseline (*Consistente*, p=0.0083).
+**Conclusão:** O CD-Ising com 20 qubits codifica **todos** os 370 atributos em pelo menos 19 (⌈370/20⌉) camadas
+sequenciais de 20 qubits (blocos montados pela MI entre atributos; não há descarte de
+atributos) e mede 210 observáveis (20 ⟨Z⟩ + 190 ⟨ZZ⟩). Atua como **compressão quântica
+370→210**: +4.97 pp vs baseline (*Consistente*, p=0.0083). Com AUC de base ≈ 0.52, esse
+ganho deve ser confirmado com o teste por dobra (Seção 6) e com outras sementes.
 Nenhuma técnica clássica ou dequantização supera o baseline significativamente aqui.
 
 ---
@@ -123,7 +130,7 @@ superiores e atingem *Promissor*; o PQFM Heisenberg fica em *Sugestivo*.
 |---|---|
 | Baixa dimensão (13 features) | PQFM CD-Ising domina; clássicas não superam baseline |
 | Média dimensão (30 features) | Clássicas dominam; PQFM Heisenberg próximo do limiar |
-| Alta dimensão (370→20 qubits) | PQFM CD-Ising domina via redução dimensional quântica |
+| Alta dimensão (370 atributos em 20 qubits) | PQFM CD-Ising domina via compressão quântica (370→210 observáveis) |
 
 ### Dequantização analítica vs. circuito quântico real
 
