@@ -49,7 +49,9 @@ vazamento de rótulo** — apenas vazamento transdutivo não supervisionado (a d
 | PQFM | XYZ (híb) | 0.8801 | −0.0085 | 0.946 | Sem ganho |
 
 **Conclusão:** Nenhuma técnica clássica ou dequantização supera o baseline significativamente.
-O **CD-Ising (pqfmlib)** é a única abordagem a atingir *Consistente* (+0.84 pp, IC > 0, p < 0.05).
+O **CD-Ising (pqfmlib)** é a única abordagem a atingir *Consistente* (+0.84 pp, IC > 0, p < 0.05)
+**sob o protocolo global (ajuste transdutivo)**. No teste de vazamento (Seção 6), com ajuste só
+no treino, o ganho cai para +0.06 pp (*Tendência positiva*); o *Consistente* não se sustenta.
 
 ---
 
@@ -94,8 +96,9 @@ overfitting severo sobre os 569 samples.
 **Conclusão:** O CD-Ising com 20 qubits codifica **todos** os 370 atributos em pelo menos 19 (⌈370/20⌉) camadas
 sequenciais de 20 qubits (blocos montados pela MI entre atributos; não há descarte de
 atributos) e mede 210 observáveis (20 ⟨Z⟩ + 190 ⟨ZZ⟩). Atua como **compressão quântica
-370→210**: +4.97 pp vs baseline (*Consistente*, p=0.0083). Com AUC de base ≈ 0.52, esse
-ganho deve ser confirmado com o teste por dobra (Seção 6) e com outras sementes.
+370→210**: +4.97 pp vs baseline (*Consistente*, p=0.0083) sob ajuste transdutivo. O teste
+por dobra (Seção 6, só 10 dobras) **não sustenta** o ganho (−5.9 pp, *Sem ganho*), embora com
+variância muito alta; o *Consistente* fica sem confirmação até rodar as 50 dobras.
 Nenhuma técnica clássica ou dequantização supera o baseline significativamente aqui.
 
 ---
@@ -119,7 +122,11 @@ Para execução: solicitar via issue em `github.com/rscarmo/pqfmlib`.
 
 **Em 2 de 3 datasets (Cardiac e I-SPY1)**, o PQFM CD-Ising (simulação quântica ideal)
 é a **única abordagem a atingir *Consistente*** — superando tanto o baseline quanto todas
-as técnicas clássicas de forma estatisticamente robusta (IC > 0, p < 0.05).
+as técnicas clássicas de forma estatisticamente robusta (IC > 0, p < 0.05) — **mas somente
+sob o protocolo global, em que J, escala e imputação usam todas as amostras**. O teste de
+vazamento (Seção 6) mostra que, ajustando só no treino de cada dobra, o ganho desaparece no
+Cardiac (+0.06 pp) e não se sustenta no I-SPY1 (10 dobras, alta variância). As afirmações
+abaixo sobre a superioridade do CD-Ising valem, portanto, para o protocolo transdutivo.
 
 **Em 1 de 3 datasets (WDBC)**, técnicas clássicas (Nystroem polinomial, autoencoder) são
 superiores e atingem *Promissor*; o PQFM Heisenberg fica em *Sugestivo*.
@@ -141,32 +148,65 @@ não é trivialmente "dequantizável" por blocos independentes.
 
 ### Implicações para a dissertação
 
-1. **CD-Ising é o mapa mais robusto** — único a atingir *Consistente* nos dois datasets
-   mais desafiadores (baixa dimensão e alta dimensão).
+1. **CD-Ising foi o mapa mais forte no protocolo global** — único a atingir *Consistente*
+   nos dois datasets mais desafiadores (baixa dimensão e alta dimensão), mas esse resultado
+   não resiste ao ajuste só no treino (Seção 6).
 2. **O ganho quântico é dependente do dataset** — não é universalmente superior nem inferior
    às clássicas; o regime de dimensionalidade e a estrutura dos dados determinam o resultado.
-3. **A simulação quântica importa** — a dequantização analítica não captura o mesmo benefício,
-   sugerindo que a geometria do espaço de Hilbert é relevante para o desempenho.
+3. **A dequantização analítica não reproduz o ganho do protocolo global**, mas como esse ganho
+   inclui um componente transdutivo (Seção 6), não dá para atribuí-lo à geometria do espaço
+   de Hilbert sem refazer a comparação com todos os mapas no protocolo por dobra.
 
 
 ---
 
-## 6. Teste de vazamento transdutivo (CD-Ising) — PENDENTE
+## 6. Teste de vazamento transdutivo (CD-Ising) — parcial (Cardiac concluído; I-SPY1 só com 10 dobras)
 
 Compara o CD-Ising com J, padronização e imputação ajustados com todas as amostras
 (protocolo acima) contra o mesmo mapa ajustado **só no treino de cada dobra**, na mesma
 execução e com a mesma versão do `pqfmlib`. Script: `run_quantum_cv_perfold.py`;
 instruções: `INSTRUCOES_TESTE_VAZAMENTO.md`.
 
-| Dataset | Baseline | CD-Ising global (híb) | CD-Ising por dobra (híb) | Δ por dobra − global | Status por dobra vs baseline |
-|---|---|---|---|---|---|
-| Cardiac | a preencher | a preencher | a preencher | a preencher | a preencher |
-| I-SPY1 | a preencher | a preencher | a preencher | a preencher | a preencher |
+AUC média (modo híbrido; entre parênteses, Δ vs baseline em pp):
 
-Execução parcial no container de nuvem (4 vCPUs): baseline do Cardiac recalculado =
-0.8883 (relatório: 0.8885); circuito CD-Ising de 13 qubits para as 303 amostras ≈ 25 s.
-Versão do `pqfmlib` nessa execução: 0.1.1 (a v0.1.1 corrigiu a ordem dos rótulos dos
-observáveis; o relatório acima usou a v0.1.0).
+| Dataset | Dobras | Baseline | CD-Ising global (híb) | CD-Ising por dobra (híb) | Δ por dobra − global (IC 95%) | Status por dobra vs baseline |
+|---|---|---|---|---|---|---|
+| Cardiac | 50 | 0.8882 | 0.8947 (+0.64; *Promissor*, p=0.037) | 0.8888 (+0.06) | −0.58 pp [−1.78; +0.61] | Tendência positiva (p=0.50) |
+| I-SPY1 | 10 (`--n_repeats 2`) | 0.5509 | 0.6090 (+5.81; *Sugestivo*, p=0.065) | 0.4914 (−5.95) | −11.75 pp [−24.1; +0.6] | Sem ganho (p=0.86) |
+
+Modo isolado: Cardiac global 0.8912 (+0.30, *Sugestivo*) e por dobra 0.8915 (+0.33,
+*Tendência positiva*), com Δ por dobra − global = +0.03 pp; I-SPY1 global 0.5494 (−0.15) e
+por dobra 0.5279 (−2.30), ambos *Sem ganho*.
+
+**Leitura:**
+
+- **Cardiac:** ao ajustar J, escala e imputação só no treino, o ganho do CD-Ising híbrido cai
+  de +0.64 para +0.06 pp, o que é indistinguível de zero. O IC de "por dobra − global"
+  contém 0, então a perda em si não é estatisticamente significativa; mas o ganho sobre o
+  baseline deixa de existir. O protocolo global já **não reproduz o *Consistente*** do
+  relatório (+0.84 pp): nesta execução ele chega só a *Promissor* (IC contém 0). Isso pode
+  vir da mudança de versão do `pqfmlib` (0.1.0 → 0.1.1); a comparação válida é a desta
+  execução.
+- **I-SPY1:** o ganho do modo global (+5.8 pp) desaparece no protocolo por dobra (−5.9 pp).
+  Na direção, é o cenário "parte do ganho vinha do ajuste transdutivo". **Ressalva forte:**
+  são só 10 dobras, com desvio-padrão da AUC entre dobras de 0.09 a 0.14 e todos os IC
+  contendo 0; o baseline aqui (0.5509) também difere do relatório (0.5248, 50 dobras). Uma
+  AUC por dobra de 0.49 é ruído (J estimada com ~129 amostras para 370 atributos), não um
+  efeito real abaixo do acaso. O resultado é suficiente para **retirar o *Consistente*** do
+  CD-Ising no I-SPY1 como conclusão firme, mas não para afirmar o tamanho do vazamento.
+  O protocolo completo (50 dobras) não foi rodado: as 10 dobras por dobra levaram ~10 h
+  (35 914 s), o que dá ~50 h para as 50.
+
+**Conclusão provisória:** nos dois datasets, o ganho do CD-Ising **não se sustenta quando
+nada do teste é usado para gerar as features**. O protocolo por dobra deve passar a ser o
+resultado principal, e os +0.84 pp (Cardiac) e +4.97 pp (I-SPY1) das Etapas 1 e 3 devem ser
+lidos como limite superior sob ajuste transdutivo.
+
+**Execução:** servidor com 24 vCPUs, 62 GB de RAM e RTX 3080 Ti; `pqfmlib` 0.1.1 (commit
+b6cd4d8; o relatório acima usou a v0.1.0, que tinha a ordem dos rótulos dos observáveis
+invertida). Circuito global: Cardiac (13 qubits, 303 amostras) 65 s; I-SPY1 (20 qubits, 161
+amostras, 210 observáveis) 3 690 s. Cardiac por dobra: 4 816 s para as 50 dobras. Baseline
+do Cardiac recalculado = 0.8882 (relatório: 0.8885).
 
 ---
 
