@@ -97,8 +97,9 @@ overfitting severo sobre os 569 samples.
 sequenciais de 20 qubits (blocos montados pela MI entre atributos; não há descarte de
 atributos) e mede 210 observáveis (20 ⟨Z⟩ + 190 ⟨ZZ⟩). Atua como **compressão quântica
 370→210**: +4.97 pp vs baseline (*Consistente*, p=0.0083) sob ajuste transdutivo. O teste
-por dobra (Seção 6, só 10 dobras) **não sustenta** o ganho (−5.9 pp, *Sem ganho*), embora com
-variância muito alta; o *Consistente* fica sem confirmação até rodar as 50 dobras.
+por dobra (Seção 6, 50 dobras) **não sustenta** o ganho (−2.44 pp, *Sem ganho*, AUC 0.5005);
+a diferença por dobra − global é de −8.52 pp (IC exclui 0). O *Consistente* é artefato do
+ajuste transdutivo.
 Nenhuma técnica clássica ou dequantização supera o baseline significativamente aqui.
 
 ---
@@ -125,8 +126,9 @@ Para execução: solicitar via issue em `github.com/rscarmo/pqfmlib`.
 as técnicas clássicas de forma estatisticamente robusta (IC > 0, p < 0.05) — **mas somente
 sob o protocolo global, em que J, escala e imputação usam todas as amostras**. O teste de
 vazamento (Seção 6) mostra que, ajustando só no treino de cada dobra, o ganho desaparece no
-Cardiac (+0.06 pp) e não se sustenta no I-SPY1 (10 dobras, alta variância). As afirmações
-abaixo sobre a superioridade do CD-Ising valem, portanto, para o protocolo transdutivo.
+Cardiac (+0.06 pp) e no I-SPY1 (−2.44 pp; diferença por dobra − global de −8.52 pp, IC exclui
+0). As afirmações abaixo sobre a superioridade do CD-Ising valem, portanto, apenas para o
+protocolo transdutivo.
 
 **Em 1 de 3 datasets (WDBC)**, técnicas clássicas (Nystroem polinomial, autoencoder) são
 superiores e atingem *Promissor*; o PQFM Heisenberg fica em *Sugestivo*.
@@ -160,7 +162,7 @@ não é trivialmente "dequantizável" por blocos independentes.
 
 ---
 
-## 6. Teste de vazamento transdutivo (CD-Ising) — parcial (Cardiac concluído; I-SPY1 só com 10 dobras)
+## 6. Teste de vazamento transdutivo (CD-Ising) — concluído
 
 Compara o CD-Ising com J, padronização e imputação ajustados com todas as amostras
 (protocolo acima) contra o mesmo mapa ajustado **só no treino de cada dobra**, na mesma
@@ -172,11 +174,12 @@ AUC média (modo híbrido; entre parênteses, Δ vs baseline em pp):
 | Dataset | Dobras | Baseline | CD-Ising global (híb) | CD-Ising por dobra (híb) | Δ por dobra − global (IC 95%) | Status por dobra vs baseline |
 |---|---|---|---|---|---|---|
 | Cardiac | 50 | 0.8882 | 0.8947 (+0.64; *Promissor*, p=0.037) | 0.8888 (+0.06) | −0.58 pp [−1.78; +0.61] | Tendência positiva (p=0.50) |
-| I-SPY1 | 10 (`--n_repeats 2`) | 0.5509 | 0.6090 (+5.81; *Sugestivo*, p=0.065) | 0.4914 (−5.95) | −11.75 pp [−24.1; +0.6] | Sem ganho (p=0.86) |
+| I-SPY1 | 50 | 0.5249 | 0.5857 (+6.08; *Consistente*, p=0.002) | 0.5005 (−2.44) | −8.52 pp [−12.3; −4.7] | Sem ganho (p=0.85) |
 
 Modo isolado: Cardiac global 0.8912 (+0.30, *Sugestivo*) e por dobra 0.8915 (+0.33,
-*Tendência positiva*), com Δ por dobra − global = +0.03 pp; I-SPY1 global 0.5494 (−0.15) e
-por dobra 0.5279 (−2.30), ambos *Sem ganho*.
+*Tendência positiva*), com Δ por dobra − global = +0.03 pp; I-SPY1 global 0.5406 (+1.57,
+*Tendência positiva*) e por dobra 0.4917 (−3.32, *Sem ganho*), com Δ por dobra − global =
+−4.89 pp [−9.5; −0.3].
 
 **Leitura:**
 
@@ -187,26 +190,25 @@ por dobra 0.5279 (−2.30), ambos *Sem ganho*.
   relatório (+0.84 pp): nesta execução ele chega só a *Promissor* (IC contém 0). Isso pode
   vir da mudança de versão do `pqfmlib` (0.1.0 → 0.1.1); a comparação válida é a desta
   execução.
-- **I-SPY1:** o ganho do modo global (+5.8 pp) desaparece no protocolo por dobra (−5.9 pp).
-  Na direção, é o cenário "parte do ganho vinha do ajuste transdutivo". **Ressalva forte:**
-  são só 10 dobras, com desvio-padrão da AUC entre dobras de 0.09 a 0.14 e todos os IC
-  contendo 0; o baseline aqui (0.5509) também difere do relatório (0.5248, 50 dobras). Uma
-  AUC por dobra de 0.49 é ruído (J estimada com ~129 amostras para 370 atributos), não um
-  efeito real abaixo do acaso. O resultado é suficiente para **retirar o *Consistente*** do
-  CD-Ising no I-SPY1 como conclusão firme, mas não para afirmar o tamanho do vazamento.
-  O protocolo completo (50 dobras) não foi rodado: as 10 dobras por dobra levaram ~10 h
-  (35 914 s), o que dá ~50 h para as 50.
+- **I-SPY1 (50 dobras):** o protocolo global reproduz o relatório (+6.08 pp, *Consistente*,
+  IC [+2.3; +9.9]), e o baseline recalculado (0.5249) bate com o dele (0.5248). Com o ajuste
+  só no treino, o ganho some: −2.44 pp (*Sem ganho*), AUC 0.5005, ou seja, nível do acaso.
+  A diferença por dobra − global é de −8.52 pp com IC [−12.3; −4.7] que **exclui 0**: o
+  vazamento transdutivo é estatisticamente significativo e explica **todo** o ganho do
+  CD-Ising nesta base.
 
-**Conclusão provisória:** nos dois datasets, o ganho do CD-Ising **não se sustenta quando
-nada do teste é usado para gerar as features**. O protocolo por dobra deve passar a ser o
-resultado principal, e os +0.84 pp (Cardiac) e +4.97 pp (I-SPY1) das Etapas 1 e 3 devem ser
-lidos como limite superior sob ajuste transdutivo.
+**Conclusão:** nos dois datasets, o ganho do CD-Ising **não se sustenta quando nada do teste
+é usado para gerar as features**. No I-SPY1 o ganho é inteiramente transdutivo; no Cardiac
+ele cai a ~0. O protocolo por dobra deve ser o resultado principal, e os +0.84 pp (Cardiac) e
++4.97 pp (I-SPY1) das Etapas 1 e 3 devem ser lidos como efeito do ajuste transdutivo, não de
+uma vantagem do mapa quântico.
 
 **Execução:** servidor com 24 vCPUs, 62 GB de RAM e RTX 3080 Ti; `pqfmlib` 0.1.1 (commit
 b6cd4d8; o relatório acima usou a v0.1.0, que tinha a ordem dos rótulos dos observáveis
 invertida). Circuito global: Cardiac (13 qubits, 303 amostras) 65 s; I-SPY1 (20 qubits, 161
-amostras, 210 observáveis) 3 690 s. Cardiac por dobra: 4 816 s para as 50 dobras. Baseline
-do Cardiac recalculado = 0.8882 (relatório: 0.8885).
+amostras, 210 observáveis) 3 610 s. Por dobra, 50 dobras: Cardiac 4 816 s; I-SPY1 179 669 s
+(~50 h). Baselines recalculados: Cardiac 0.8882 (relatório: 0.8885); I-SPY1 0.5249
+(relatório: 0.5248).
 
 ---
 
