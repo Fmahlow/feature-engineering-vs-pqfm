@@ -181,6 +181,12 @@ Modo isolado: Cardiac global 0.8912 (+0.30, *Sugestivo*) e por dobra 0.8915 (+0.
 *Tendência positiva*) e por dobra 0.4917 (−3.32, *Sem ganho*), com Δ por dobra − global =
 −4.89 pp [−9.5; −0.3].
 
+![Teste de vazamento do CD-Ising: global vs por dobra](results/figures/vazamento_cdising_global_vs_por_dobra.png)
+
+*Em cima: AUC de cada uma das 50 dobras externas no modo híbrido (ponto grande = média;
+linha tracejada = média do baseline). Embaixo: Δ AUC vs baseline em pp, com IC 95%, nos modos
+híbrido e isolado. Gerada por `plot_vazamento.py`.*
+
 **Leitura:**
 
 - **Cardiac:** ao ajustar J, escala e imputação só no treino, o ganho do CD-Ising híbrido cai
@@ -213,4 +219,5 @@ amostras, 210 observáveis) 3 610 s. Por dobra, 50 dobras: Cardiac 4 816 s; I-SP
 ---
 
 *Figuras completas: `results/figures/etapa{1,2,3}_{dataset}_completo.png`*
+*Figura do teste de vazamento: `results/figures/vazamento_cdising_global_vs_por_dobra.png`*
 *Dados brutos: `results/etapa{N}_{dataset}_{resultados,quantum_resultados,estatistica_pareada}.csv`*
